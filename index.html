@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="文法メモ"/>
+<meta name="theme-color" content="#111111"/>
+<title>文法メモ — Grammar Capture</title>
+<style>
+:root {
+  --bg: #111;
+  --card: #1c1c1e;
+  --card2: #242426;
+  --border: #2c2c2e;
+  --text: #f0f0f0;
+  --muted: #888;
+  --accent: #f97316;
+  --accent-dim: rgba(249,115,22,0.15);
+  --blue: #3b82f6;
+  --green: #22c55e;
+  --yellow: #f59e0b;
+  --purple: #a855f7;
+  --radius: 14px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', -apple-system, sans-serif; overscroll-behavior: none; }
+
+#app { display: flex; flex-direction: column; height: 100%; max-width: 480px; margin: 0 auto; }
+
+/* Header */
+header {
+  padding: 16px 20px 12px;
+  padding-top: calc(16px + env(safe-area-inset-top, 0px));
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(17,17,17,0.95);
+  backdrop-filter: blur(12px);
+  position: sticky; top: 0; z-index: 10;
+}
+.header-title { display: flex; align-items: baseline; gap: 8px; }
+.header-title h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+.header-title span { font-size: 12px; color: var(--muted); }
+.icon-btn {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--card); border: 1px solid var(--border);
+  color: var(--muted); font-size: 16px;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  transition: all 0.15s;
+}
+.icon-btn:active { background: var(--card2); transform: scale(0.94); }
+
+/* Tabs */
+.tabbar { display: flex; border-bottom: 1px solid var(--border); background: var(--bg); }
+.tab-btn {
+  flex: 1; padding: 11px 0; font-size: 13px; font-weight: 500;
+  color: var(--muted); background: none; border: none; cursor: pointer;
+  border-bottom: 2px solid transparent; transition: all 0.15s;
+}
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* Screens */
+.screen { flex: 1; overflow-y: auto; padding: 20px; display: none; flex-direction: column; gap: 14px; }
+.screen.active { display: flex; }
+.screen { padding-bottom: calc(24px + var(--safe-bottom)); }
+
+/* Fields */
+label { font-size: 11px; font-weight: 600; letter-spacing: 0.07em; color: var(--muted); text-transform: uppercase; display: block; margin-bottom: 6px; }
+.field-group { display: flex; flex-direction: column; }
+input[type=text], textarea {
+  background: var(--card); border: 1px solid var(--border);
+  color: var(--text); border-radius: 10px; padding: 12px 14px;
+  font-size: 16px; font-family: inherit; width: 100%; outline: none;
+  transition: border-color 0.15s; -webkit-appearance: none;
+}
+input[type=text]:focus, textarea:focus { border-color: var(--accent); }
+textarea { resize: none; min-height: 80px; line-height: 1.5; }
+.pattern-input { font-size: 22px !important; font-weight: 600; letter-spacing: 0.02em; text-align: center; }
+
+/* Lookup button */
+.lookup-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  background: var(--accent-dim); border: 1px solid rgba(249,115,22,0.4);
+  color: var(--accent); border-radius: 10px; padding: 12px;
+  font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; width: 100%;
+}
+.lookup-btn:active { transform: scale(0.97); background: rgba(249,115,22,0.25); }
+.lookup-btn:disabled { opacity: 0.4; cursor: default; transform: none; }
+
+/* Jisho result box */
+.result-box {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px;
+  display: none; flex-direction: column; gap: 10px;
+}
+.result-box.visible { display: flex; }
+.result-header { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.result-word { font-size: 22px; font-weight: 700; }
+.result-reading { font-size: 14px; color: var(--muted); }
+.result-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag {
+  font-size: 11px; font-weight: 600; border-radius: 6px; padding: 3px 8px;
+  letter-spacing: 0.03em;
+}
+.tag-jlpt { background: rgba(168,85,247,0.15); color: var(--purple); }
+.tag-pos  { background: rgba(59,130,246,0.12); color: var(--blue); }
+.tag-common { background: rgba(34,197,94,0.12); color: var(--green); }
+.result-meanings { display: flex; flex-direction: column; gap: 6px; }
+.meaning-row { display: flex; gap: 8px; align-items: flex-start; }
+.meaning-num { font-size: 11px; color: var(--muted); min-width: 16px; padding-top: 2px; }
+.meaning-text { font-size: 14px; line-height: 1.55; }
+.result-label { font-size: 11px; font-weight: 600; letter-spacing: 0.07em; color: var(--accent); text-transform: uppercase; }
+.no-result { font-size: 14px; color: var(--muted); text-align: center; padding: 8px 0; }
+
+/* Bunpro button */
+.bunpro-btn {
+  display: none; align-items: center; justify-content: center; gap: 6px;
+  background: var(--card); border: 1px solid var(--border);
+  color: var(--blue); border-radius: 10px; padding: 11px;
+  font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s;
+  width: 100%; text-decoration: none;
+}
+.bunpro-btn.visible { display: flex; }
+.bunpro-btn:active { transform: scale(0.97); }
+
+/* Save button */
+.save-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  background: var(--accent); border: none;
+  color: #fff; border-radius: 12px; padding: 15px;
+  font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.15s; width: 100%;
+}
+.save-btn:active { transform: scale(0.97); filter: brightness(0.9); }
+.save-btn:disabled { opacity: 0.4; cursor: default; transform: none; }
+
+/* Divider */
+.divider { height: 1px; background: var(--border); }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: calc(24px + var(--safe-bottom)); left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--card2); border: 1px solid var(--border);
+  color: var(--text); border-radius: 20px; padding: 10px 18px;
+  font-size: 13px; font-weight: 500;
+  opacity: 0; transition: all 0.25s; pointer-events: none; z-index: 100; white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Log */
+.log-header { display: flex; align-items: center; justify-content: space-between; }
+.refresh-btn { font-size: 12px; color: var(--muted); background: none; border: none; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: all 0.15s; }
+.refresh-btn:active { background: var(--card); }
+.log-entry { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+.log-entry-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.log-pattern { font-size: 18px; font-weight: 700; }
+.log-status { font-size: 11px; font-weight: 600; border-radius: 6px; padding: 3px 8px; }
+.status-Captured  { background: rgba(249,115,22,0.15); color: var(--accent); }
+.status-Looked-up { background: rgba(59,130,246,0.15); color: var(--blue); }
+.status-Added     { background: rgba(34,197,94,0.15); color: var(--green); }
+.status-Skipped   { background: rgba(136,136,136,0.15); color: var(--muted); }
+.log-source { font-size: 12px; color: var(--muted); }
+.log-meanings { font-size: 13px; color: #ccc; line-height: 1.55; border-top: 1px solid var(--border); padding-top: 8px; margin-top: 2px; }
+.log-actions { display: flex; gap: 8px; margin-top: 4px; }
+.log-action-btn { flex: 1; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 600; border: 1px solid var(--border); background: var(--card2); color: var(--muted); cursor: pointer; transition: all 0.15s; }
+.log-action-btn:active { transform: scale(0.96); }
+.log-action-btn.bunpro { color: var(--blue); border-color: rgba(59,130,246,0.3); }
+.log-action-btn.done   { color: var(--green); border-color: rgba(34,197,94,0.3); }
+
+.empty-state { text-align: center; color: var(--muted); font-size: 14px; padding: 48px 0; line-height: 1.7; }
+.empty-state .big { font-size: 36px; margin-bottom: 12px; }
+
+.loading-spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Settings */
+.settings-group { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.settings-row { padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid var(--border); }
+.settings-row:last-child { border-bottom: none; }
+.settings-row label { margin-bottom: 0; }
+.settings-row p { font-size: 12px; color: var(--muted); line-height: 1.6; }
+.settings-row a { color: var(--accent); text-decoration: none; }
+.settings-section-title { font-size: 11px; font-weight: 600; letter-spacing: 0.07em; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+.key-row { display: flex; gap: 8px; }
+.key-row input { flex: 1; }
+.show-btn { padding: 12px; background: var(--card2); border: 1px solid var(--border); color: var(--muted); border-radius: 10px; cursor: pointer; font-size: 13px; white-space: nowrap; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+.dot-ok   { background: var(--green); }
+.dot-warn { background: var(--yellow); }
+.free-badge { display: inline-block; font-size: 10px; font-weight: 700; background: rgba(34,197,94,0.15); color: var(--green); border-radius: 5px; padding: 2px 6px; letter-spacing: 0.05em; margin-left: 6px; vertical-align: middle; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <div class="header-title">
+      <h1>文法メモ</h1>
+      <span>Grammar Capture</span>
+    </div>
+    <button class="icon-btn" onclick="showTab('settings')" title="Settings">⚙️</button>
+  </header>
+
+  <div class="tabbar">
+    <button class="tab-btn active" id="tab-capture" onclick="showTab('capture')">＋ Capture</button>
+    <button class="tab-btn" id="tab-log"     onclick="showTab('log')">Log</button>
+    <button class="tab-btn" id="tab-settings" onclick="showTab('settings')">Settings</button>
+  </div>
+
+  <!-- ═══ CAPTURE ═══ -->
+  <div class="screen active" id="screen-capture">
+
+    <div class="field-group">
+      <label>Grammar Pattern</label>
+      <input type="text" class="pattern-input" id="input-pattern" placeholder="〜てしまう" autocomplete="off" autocorrect="off" spellcheck="false"/>
+    </div>
+
+    <div class="field-group">
+      <label>Source <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+      <input type="text" id="input-source" placeholder="Book title, show name…" autocomplete="off"/>
+    </div>
+
+    <div class="field-group">
+      <label>Your Notes <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+      <textarea id="input-notes" placeholder="Context, what confused you…" rows="3"></textarea>
+    </div>
+
+    <button class="lookup-btn" id="lookup-btn" onclick="doLookup()">
+      🔍 Look up on Jisho
+    </button>
+
+    <div class="result-box" id="result-box">
+      <div class="result-label">Jisho Result</div>
+      <div id="result-content"></div>
+    </div>
+
+    <a class="bunpro-btn" id="bunpro-btn" href="#" target="_blank" rel="noopener">
+      🔗 Search on Bunpro →
+    </a>
+
+    <div class="divider"></div>
+
+    <button class="save-btn" id="save-btn" onclick="doSave()">
+      Save to Notion
+    </button>
+
+  </div>
+
+  <!-- ═══ LOG ═══ -->
+  <div class="screen" id="screen-log">
+    <div class="log-header">
+      <label style="margin-bottom:0">Recent Captures</label>
+      <button class="refresh-btn" onclick="loadLog()">↻ Refresh</button>
+    </div>
+    <div id="log-list">
+      <div class="empty-state"><div class="big">📖</div>No entries yet.<br>Capture your first grammar point!</div>
+    </div>
+  </div>
+
+  <!-- ═══ SETTINGS ═══ -->
+  <div class="screen" id="screen-settings">
+
+    <div class="settings-group">
+      <div class="settings-row" style="background: rgba(34,197,94,0.05);">
+        <label>Jisho Dictionary <span class="free-badge">FREE</span></label>
+        <p>Grammar lookups use the free Jisho public API — no account or key needed. Works automatically.</p>
+      </div>
+    </div>
+
+    <p class="settings-section-title" style="margin-top:16px">Notion</p>
+    <div class="settings-group">
+      <div class="settings-row">
+        <label>Integration Token <span id="dot-notion" class="status-dot dot-warn"></span></label>
+        <p>Lets the app save to your Notion workspace. Create a free internal integration at <a href="https://www.notion.so/my-integrations" target="_blank">notion.so/my-integrations</a>, then open your <strong>Japanese grammar</strong> page in Notion → click <strong>…</strong> → <strong>Connections</strong> → add your integration.</p>
+        <div class="key-row">
+          <input type="password" id="key-notion" placeholder="secret_…" autocomplete="off" autocorrect="off" spellcheck="false"/>
+          <button class="show-btn" onclick="toggleShow('key-notion', this)">Show</button>
+        </div>
+      </div>
+    </div>
+
+    <button class="save-btn" onclick="saveSettings()" style="margin-top:4px">Save Settings</button>
+
+    <p class="settings-section-title" style="margin-top:20px">About</p>
+    <div class="settings-group">
+      <div class="settings-row">
+        <label>Notion Database</label>
+        <p>Saves to <strong>Grammar Discovery Log</strong> inside your Japanese grammar page. <a href="https://www.notion.so/ef6da210e321448fb014adf2a3a41fa2" target="_blank">Open in Notion →</a></p>
+      </div>
+      <div class="settings-row">
+        <label>Add to Home Screen</label>
+        <p>In Safari: tap the <strong>Share</strong> button → <strong>Add to Home Screen</strong> for an app-like experience with no browser bar.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const NOTION_DB_ID = 'ef6da210e321448fb014adf2a3a41fa2';
+
+// ── Storage ────────────────────────────────────────────────────
+const getKey = k => localStorage.getItem(k) || '';
+const setKey = (k,v) => localStorage.setItem(k,v);
+
+document.addEventListener('DOMContentLoaded', () => {
+  const nk = getKey('notion_key');
+  if (nk) document.getElementById('key-notion').value = nk;
+  updateDots();
+});
+
+function updateDots() {
+  const nk = getKey('notion_key');
+  const dot = document.getElementById('dot-notion');
+  dot.className = 'status-dot ' + (nk ? 'dot-ok' : 'dot-warn');
+}
+
+// ── Tabs ───────────────────────────────────────────────────────
+function showTab(tab) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + tab).classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+  if (tab === 'log') loadLog();
+}
+
+// ── Toast ──────────────────────────────────────────────────────
+function toast(msg, duration = 2400) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), duration);
+}
+
+// ── Settings ───────────────────────────────────────────────────
+function saveSettings() {
+  setKey('notion_key', document.getElementById('key-notion').value.trim());
+  updateDots();
+  toast('✓ Settings saved');
+}
+function toggleShow(id, btn) {
+  const inp = document.getElementById(id);
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.textContent = inp.type === 'password' ? 'Show' : 'Hide';
+}
+
+// ── Jisho Lookup ───────────────────────────────────────────────
+let lastLookupSummary = '';
+
+async function doLookup() {
+  const raw = document.getElementById('input-pattern').value.trim();
+  if (!raw) { toast('Enter a grammar pattern first'); return; }
+
+  // Strip leading 〜 ～ for the search query
+  const query = raw.replace(/^[〜～\s]+/, '').trim();
+
+  const btn = document.getElementById('lookup-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading-spinner"></span> Looking up…';
+
+  const box     = document.getElementById('result-box');
+  const content = document.getElementById('result-content');
+
+  try {
+    const res = await fetch(`https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(query)}`);
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
+
+    if (!data.data || !data.data.length) {
+      content.innerHTML = '<div class="no-result">No results found. Try a shorter form or the core verb.</div>';
+      lastLookupSummary = '';
+      box.classList.add('visible');
+    } else {
+      const top = data.data[0];
+      const html = buildResultHTML(top);
+      content.innerHTML = html;
+      lastLookupSummary = buildSummaryText(top);
+      box.classList.add('visible');
+
+      // Bunpro link
+      const encoded = encodeURIComponent(query);
+      const bp = document.getElementById('bunpro-btn');
+      bp.href = `https://bunpro.jp/search?q=${encoded}`;
+      bp.classList.add('visible');
+    }
+  } catch (e) {
+    content.innerHTML = '<div class="no-result">Lookup failed — check your connection.</div>';
+    box.classList.add('visible');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '🔍 Look up on Jisho';
+}
+
+function buildResultHTML(entry) {
+  const japanese = entry.japanese || [];
+  const senses   = entry.senses   || [];
+  const isCommon = entry.is_common;
+
+  const word    = japanese[0]?.word    || japanese[0]?.reading || '';
+  const reading = japanese[0]?.reading || '';
+
+  // Tags: JLPT, common
+  const tags = [];
+  if (isCommon) tags.push(`<span class="tag tag-common">common</span>`);
+  (entry.jlpt || []).forEach(j => tags.push(`<span class="tag tag-jlpt">${j.toUpperCase()}</span>`));
+
+  // Up to 3 senses
+  const shownSenses = senses.slice(0, 3);
+  const meaningsHTML = shownSenses.map((s, i) => {
+    const pos = (s.parts_of_speech || []).slice(0,2).map(p =>
+      `<span class="tag tag-pos">${p}</span>`
+    ).join('');
+    const defs = (s.english_definitions || []).slice(0, 4).join('; ');
+    return `
+      ${pos ? `<div class="result-tags" style="margin-bottom:4px">${pos}</div>` : ''}
+      <div class="meaning-row">
+        <span class="meaning-num">${i+1}.</span>
+        <span class="meaning-text">${defs}</span>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="result-header">
+      ${word ? `<span class="result-word">${word}</span>` : ''}
+      ${reading && reading !== word ? `<span class="result-reading">${reading}</span>` : ''}
+    </div>
+    ${tags.length ? `<div class="result-tags">${tags.join('')}</div>` : ''}
+    <div class="result-meanings">${meaningsHTML}</div>
+  `;
+}
+
+function buildSummaryText(entry) {
+  const japanese = entry.japanese || [];
+  const senses   = entry.senses   || [];
+  const word     = japanese[0]?.word || japanese[0]?.reading || '';
+  const reading  = japanese[0]?.reading || '';
+  const jlpt     = (entry.jlpt || []).join(', ').toUpperCase();
+  const defs     = senses.slice(0,2).map(s =>
+    (s.english_definitions || []).slice(0,3).join(', ')
+  ).join(' / ');
+  return [word && `Word: ${word}`, reading && `Reading: ${reading}`, jlpt && `JLPT: ${jlpt}`, defs && `Meanings: ${defs}`].filter(Boolean).join(' | ');
+}
+
+// ── Save to Notion ─────────────────────────────────────────────
+async function doSave() {
+  const pattern = document.getElementById('input-pattern').value.trim();
+  if (!pattern) { toast('Enter a grammar pattern first'); return; }
+
+  const nk = getKey('notion_key');
+  if (!nk) { toast('Add your Notion token in Settings'); showTab('settings'); return; }
+
+  const source  = document.getElementById('input-source').value.trim();
+  const notes   = document.getElementById('input-notes').value.trim();
+  const hasLookup = !!lastLookupSummary;
+
+  const btn = document.getElementById('save-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading-spinner"></span> Saving…';
+
+  const properties = {
+    Pattern: { title: [{ text: { content: pattern } }] },
+    Status:  { select: { name: hasLookup ? 'Explained' : 'Captured' } },
+    'Added to Bunpro': { checkbox: false }
+  };
+  if (source)         properties['Source']         = { rich_text: [{ text: { content: source } }] };
+  if (notes)          properties['Notes']           = { rich_text: [{ text: { content: notes } }] };
+  if (lastLookupSummary) properties['AI Explanation'] = { rich_text: [{ text: { content: lastLookupSummary } }] };
+
+  try {
+    const res = await fetch('https://api.notion.com/v1/pages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${nk}`,
+        'Notion-Version': '2022-06-28'
+      },
+      body: JSON.stringify({ parent: { database_id: NOTION_DB_ID }, properties })
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || res.status);
+    }
+
+    toast('✓ Saved to Notion!');
+    resetForm();
+
+  } catch (e) {
+    toast('Save failed — check your Notion token');
+    console.error(e);
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = 'Save to Notion';
+}
+
+function resetForm() {
+  document.getElementById('input-pattern').value = '';
+  document.getElementById('input-source').value  = '';
+  document.getElementById('input-notes').value   = '';
+  document.getElementById('result-box').classList.remove('visible');
+  document.getElementById('bunpro-btn').classList.remove('visible');
+  document.getElementById('bunpro-btn').href = '#';
+  lastLookupSummary = '';
+}
+
+// ── Load Log ───────────────────────────────────────────────────
+async function loadLog() {
+  const nk   = getKey('notion_key');
+  const list = document.getElementById('log-list');
+
+  if (!nk) {
+    list.innerHTML = '<div class="empty-state"><div class="big">🔑</div>Add your Notion token<br>in Settings to see your log.</div>';
+    return;
+  }
+
+  list.innerHTML = '<div class="empty-state"><span class="loading-spinner" style="width:24px;height:24px;border-width:3px;margin:48px auto;display:block"></span></div>';
+
+  try {
+    const res = await fetch(`https://api.notion.com/v1/databases/${NOTION_DB_ID}/query`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${nk}`,
+        'Notion-Version': '2022-06-28'
+      },
+      body: JSON.stringify({ sorts: [{ timestamp: 'created_time', direction: 'descending' }], page_size: 30 })
+    });
+
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
+
+    if (!data.results.length) {
+      list.innerHTML = '<div class="empty-state"><div class="big">📖</div>No entries yet.<br>Capture your first grammar point!</div>';
+      return;
+    }
+
+    list.innerHTML = '';
+    for (const page of data.results) {
+      const p       = page.properties;
+      const pattern = p.Pattern?.title?.[0]?.text?.content || '—';
+      const source  = p.Source?.rich_text?.[0]?.text?.content || '';
+      const summary = p['AI Explanation']?.rich_text?.[0]?.text?.content || '';
+      const status  = p.Status?.select?.name || 'Captured';
+      const addedBP = p['Added to Bunpro']?.checkbox || false;
+      const pageId  = page.id;
+
+      const statusKey   = addedBP ? 'Added' : status.replace(/\s+/g, '-');
+      const statusLabel = addedBP ? '✓ In Bunpro' : status;
+
+      const searchTerm  = encodeURIComponent(pattern.replace(/^[〜～\s]+/, ''));
+
+      const el = document.createElement('div');
+      el.className = 'log-entry';
+      el.innerHTML = `
+        <div class="log-entry-top">
+          <span class="log-pattern">${pattern}</span>
+          <span class="log-status status-${statusKey}">${statusLabel}</span>
+        </div>
+        ${source  ? `<div class="log-source">📚 ${source}</div>` : ''}
+        ${summary ? `<div class="log-meanings">${summary}</div>` : ''}
+        <div class="log-actions">
+          <button class="log-action-btn bunpro" onclick="window.open('https://bunpro.jp/search?q=${searchTerm}','_blank')">Search Bunpro</button>
+          ${!addedBP ? `<button class="log-action-btn done" onclick="markAdded('${pageId}', this)">✓ Added to Bunpro</button>` : ''}
+        </div>
+      `;
+      list.appendChild(el);
+    }
+  } catch (e) {
+    list.innerHTML = '<div class="empty-state"><div class="big">⚠️</div>Couldn\'t load log.<br>Check your Notion token.</div>';
+    console.error(e);
+  }
+}
+
+async function markAdded(pageId, btn) {
+  const nk = getKey('notion_key');
+  if (!nk) return;
+  btn.disabled = true;
+  btn.textContent = '…';
+  try {
+    await fetch(`https://api.notion.com/v1/pages/${pageId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${nk}`,
+        'Notion-Version': '2022-06-28'
+      },
+      body: JSON.stringify({
+        properties: {
+          'Added to Bunpro': { checkbox: true },
+          'Status': { select: { name: 'Added to Bunpro' } }
+        }
+      })
+    });
+    toast('✓ Marked as added!');
+    loadLog();
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = '✓ Added to Bunpro';
+    toast('Update failed');
+  }
+}
+</script>
+</body>
+</html>
