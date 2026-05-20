@@ -7,317 +7,493 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="文法メモ"/>
 <meta name="theme-color" content="#111111"/>
-<title>文法メモ — Grammar Capture</title>
+<title>文法メモ</title>
 <style>
 :root {
-  --bg: #111;
-  --card: #1c1c1e;
-  --card2: #242426;
-  --border: #2c2c2e;
-  --text: #f0f0f0;
-  --muted: #888;
-  --accent: #f97316;
-  --accent-dim: rgba(249,115,22,0.15);
-  --blue: #3b82f6;
-  --green: #22c55e;
-  --yellow: #f59e0b;
-  --purple: #a855f7;
-  --radius: 14px;
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --bg: #111; --card: #1c1c1e; --card2: #242426; --border: #2c2c2e;
+  --text: #f0f0f0; --muted: #888; --accent: #f97316; --accent-dim: rgba(249,115,22,0.15);
+  --blue: #3b82f6; --green: #22c55e; --red: #ef4444;
+  --n5: #22c55e; --n4: #3b82f6; --n3: #f59e0b; --n2: #f97316; --n1: #a855f7;
+  --radius: 14px; --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', -apple-system, sans-serif; overscroll-behavior: none; }
-
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Hiragino Sans','Hiragino Kaku Gothic ProN',-apple-system,sans-serif; overscroll-behavior: none; }
 #app { display: flex; flex-direction: column; height: 100%; max-width: 480px; margin: 0 auto; }
 
-/* Header */
-header {
-  padding: 16px 20px 12px;
-  padding-top: calc(16px + env(safe-area-inset-top, 0px));
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-  background: rgba(17,17,17,0.95);
-  backdrop-filter: blur(12px);
-  position: sticky; top: 0; z-index: 10;
-}
+header { padding: 16px 20px 12px; padding-top: calc(16px + env(safe-area-inset-top,0px)); border-bottom: 1px solid var(--border); background: rgba(17,17,17,.95); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 10; }
 .header-title { display: flex; align-items: baseline; gap: 8px; }
-.header-title h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+.header-title h1 { font-size: 20px; font-weight: 700; letter-spacing: -.3px; }
 .header-title span { font-size: 12px; color: var(--muted); }
-.icon-btn {
-  width: 36px; height: 36px; border-radius: 10px;
-  background: var(--card); border: 1px solid var(--border);
-  color: var(--muted); font-size: 16px;
-  display: flex; align-items: center; justify-content: center; cursor: pointer;
-  transition: all 0.15s;
-}
-.icon-btn:active { background: var(--card2); transform: scale(0.94); }
 
-/* Tabs */
 .tabbar { display: flex; border-bottom: 1px solid var(--border); background: var(--bg); }
-.tab-btn {
-  flex: 1; padding: 11px 0; font-size: 13px; font-weight: 500;
-  color: var(--muted); background: none; border: none; cursor: pointer;
-  border-bottom: 2px solid transparent; transition: all 0.15s;
-}
+.tab-btn { flex: 1; padding: 11px 0; font-size: 13px; font-weight: 500; color: var(--muted); background: none; border: none; cursor: pointer; border-bottom: 2px solid transparent; transition: all .15s; }
 .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-/* Screens */
-.screen { flex: 1; overflow-y: auto; padding: 20px; display: none; flex-direction: column; gap: 14px; }
+.screen { flex: 1; overflow-y: auto; padding: 20px; display: none; flex-direction: column; gap: 14px; padding-bottom: calc(24px + var(--safe-bottom)); }
 .screen.active { display: flex; }
-.screen { padding-bottom: calc(24px + var(--safe-bottom)); }
 
-/* Fields */
-label { font-size: 11px; font-weight: 600; letter-spacing: 0.07em; color: var(--muted); text-transform: uppercase; display: block; margin-bottom: 6px; }
+label { font-size: 11px; font-weight: 600; letter-spacing: .07em; color: var(--muted); text-transform: uppercase; display: block; margin-bottom: 6px; }
 .field-group { display: flex; flex-direction: column; }
-input[type=text], textarea {
-  background: var(--card); border: 1px solid var(--border);
-  color: var(--text); border-radius: 10px; padding: 12px 14px;
-  font-size: 16px; font-family: inherit; width: 100%; outline: none;
-  transition: border-color 0.15s; -webkit-appearance: none;
-}
+input[type=text], textarea { background: var(--card); border: 1px solid var(--border); color: var(--text); border-radius: 10px; padding: 12px 14px; font-size: 16px; font-family: inherit; width: 100%; outline: none; transition: border-color .15s; -webkit-appearance: none; }
 input[type=text]:focus, textarea:focus { border-color: var(--accent); }
 textarea { resize: none; min-height: 80px; line-height: 1.5; }
-.pattern-input { font-size: 22px !important; font-weight: 600; letter-spacing: 0.02em; text-align: center; }
+.pattern-input { font-size: 22px !important; font-weight: 600; text-align: center; }
 
-/* Lookup button */
-.lookup-btn {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  background: var(--accent-dim); border: 1px solid rgba(249,115,22,0.4);
-  color: var(--accent); border-radius: 10px; padding: 12px;
-  font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; width: 100%;
-}
-.lookup-btn:active { transform: scale(0.97); background: rgba(249,115,22,0.25); }
-.lookup-btn:disabled { opacity: 0.4; cursor: default; transform: none; }
+.pattern-row { display: flex; gap: 8px; align-items: stretch; }
+.pattern-row input { flex: 1; min-width: 0; }
+.icon-btn { width: 48px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; }
+.icon-btn:active { background: var(--card2); transform: scale(.94); }
+#camera-input { display: none; }
 
-/* Jisho result box */
-.result-box {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 14px;
-  display: none; flex-direction: column; gap: 10px;
-}
-.result-box.visible { display: flex; }
-.result-header { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-.result-word { font-size: 22px; font-weight: 700; }
-.result-reading { font-size: 14px; color: var(--muted); }
-.result-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-.tag {
-  font-size: 11px; font-weight: 600; border-radius: 6px; padding: 3px 8px;
-  letter-spacing: 0.03em;
-}
-.tag-jlpt { background: rgba(168,85,247,0.15); color: var(--purple); }
-.tag-pos  { background: rgba(59,130,246,0.12); color: var(--blue); }
-.tag-common { background: rgba(34,197,94,0.12); color: var(--green); }
-.result-meanings { display: flex; flex-direction: column; gap: 6px; }
-.meaning-row { display: flex; gap: 8px; align-items: flex-start; }
-.meaning-num { font-size: 11px; color: var(--muted); min-width: 16px; padding-top: 2px; }
-.meaning-text { font-size: 14px; line-height: 1.55; }
-.result-label { font-size: 11px; font-weight: 600; letter-spacing: 0.07em; color: var(--accent); text-transform: uppercase; }
-.no-result { font-size: 14px; color: var(--muted); text-align: center; padding: 8px 0; }
+/* JLPT row */
+.jlpt-label-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.jlpt-auto-status { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 5px; min-height: 16px; }
+.mini-spinner { display: inline-block; width: 10px; height: 10px; border: 1.5px solid rgba(255,255,255,.2); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
+.jlpt-row { display: flex; gap: 6px; }
+.jlpt-btn { flex: 1; padding: 10px 4px; border-radius: 8px; font-size: 13px; font-weight: 700; border: 1px solid var(--border); background: var(--card); color: var(--muted); cursor: pointer; transition: all .15s; letter-spacing: .02em; }
+.jlpt-btn:active { transform: scale(.95); }
+.jlpt-btn.selected-N5 { background: rgba(34,197,94,.15);  border-color: var(--n5); color: var(--n5); }
+.jlpt-btn.selected-N4 { background: rgba(59,130,246,.15); border-color: var(--n4); color: var(--n4); }
+.jlpt-btn.selected-N3 { background: rgba(245,158,11,.15); border-color: var(--n3); color: var(--n3); }
+.jlpt-btn.selected-N2 { background: rgba(249,115,22,.15); border-color: var(--n2); color: var(--n2); }
+.jlpt-btn.selected-N1 { background: rgba(168,85,247,.15); border-color: var(--n1); color: var(--n1); }
 
-/* Bunpro button */
-.bunpro-btn {
-  display: none; align-items: center; justify-content: center; gap: 6px;
-  background: var(--card); border: 1px solid var(--border);
-  color: var(--blue); border-radius: 10px; padding: 11px;
-  font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s;
-  width: 100%; text-decoration: none;
-}
-.bunpro-btn.visible { display: flex; }
-.bunpro-btn:active { transform: scale(0.97); }
+.jlpt-badge { font-size: 11px; font-weight: 700; border-radius: 6px; padding: 3px 8px; letter-spacing: .05em; }
+.badge-N5 { background: rgba(34,197,94,.15);  color: var(--n5); }
+.badge-N4 { background: rgba(59,130,246,.15); color: var(--n4); }
+.badge-N3 { background: rgba(245,158,11,.15); color: var(--n3); }
+.badge-N2 { background: rgba(249,115,22,.15); color: var(--n2); }
+.badge-N1 { background: rgba(168,85,247,.15); color: var(--n1); }
 
-/* Save button */
-.save-btn {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  background: var(--accent); border: none;
-  color: #fff; border-radius: 12px; padding: 15px;
-  font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.15s; width: 100%;
-}
-.save-btn:active { transform: scale(0.97); filter: brightness(0.9); }
-.save-btn:disabled { opacity: 0.4; cursor: default; transform: none; }
+.btn-row { display: flex; gap: 10px; }
+.lookup-btn, .bunpro-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 10px; padding: 13px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .15s; text-decoration: none; border: 1px solid var(--border); background: none; }
+.lookup-btn  { background: var(--accent-dim); border-color: rgba(249,115,22,.4); color: var(--accent); }
+.bunpro-btn  { background: var(--card); color: var(--blue); border-color: rgba(59,130,246,.3); }
+.lookup-btn:active, .bunpro-btn:active { transform: scale(.97); }
 
-/* Divider */
 .divider { height: 1px; background: var(--border); }
-
-/* Toast */
-.toast {
-  position: fixed; bottom: calc(24px + var(--safe-bottom)); left: 50%;
-  transform: translateX(-50%) translateY(20px);
-  background: var(--card2); border: 1px solid var(--border);
-  color: var(--text); border-radius: 20px; padding: 10px 18px;
-  font-size: 13px; font-weight: 500;
-  opacity: 0; transition: all 0.25s; pointer-events: none; z-index: 100; white-space: nowrap;
-}
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.save-btn { display: flex; align-items: center; justify-content: center; background: var(--accent); border: none; color: #fff; border-radius: 12px; padding: 15px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all .15s; width: 100%; }
+.save-btn:active { transform: scale(.97); filter: brightness(.9); }
 
 /* Log */
-.log-header { display: flex; align-items: center; justify-content: space-between; }
-.refresh-btn { font-size: 12px; color: var(--muted); background: none; border: none; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: all 0.15s; }
-.refresh-btn:active { background: var(--card); }
-.log-entry { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; display: flex; flex-direction: column; gap: 6px; }
-.log-entry-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
-.log-pattern { font-size: 18px; font-weight: 700; }
-.log-status { font-size: 11px; font-weight: 600; border-radius: 6px; padding: 3px 8px; }
-.status-Captured  { background: rgba(249,115,22,0.15); color: var(--accent); }
-.status-Looked-up { background: rgba(59,130,246,0.15); color: var(--blue); }
-.status-Added     { background: rgba(34,197,94,0.15); color: var(--green); }
-.status-Skipped   { background: rgba(136,136,136,0.15); color: var(--muted); }
+.log-toolbar { display: flex; align-items: center; gap: 8px; }
+.log-search { flex: 1; background: var(--card); border: 1px solid var(--border); color: var(--text); border-radius: 10px; padding: 10px 14px; font-size: 15px; font-family: inherit; outline: none; -webkit-appearance: none; }
+.log-search:focus { border-color: var(--accent); }
+.export-btn { padding: 10px 12px; background: var(--card); border: 1px solid var(--border); color: var(--muted); border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all .15s; }
+.export-btn:active { background: var(--card2); }
+
+.filter-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+.filter-row::-webkit-scrollbar { display: none; }
+.filter-pill { flex-shrink: 0; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid var(--border); background: var(--card); color: var(--muted); cursor: pointer; transition: all .15s; white-space: nowrap; }
+.filter-pill:active { transform: scale(.95); }
+.filter-pill.active-all  { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+.filter-pill.active-N5   { background: rgba(34,197,94,.15);  border-color: var(--n5); color: var(--n5); }
+.filter-pill.active-N4   { background: rgba(59,130,246,.15); border-color: var(--n4); color: var(--n4); }
+.filter-pill.active-N3   { background: rgba(245,158,11,.15); border-color: var(--n3); color: var(--n3); }
+.filter-pill.active-N2   { background: rgba(249,115,22,.15); border-color: var(--n2); color: var(--n2); }
+.filter-pill.active-N1   { background: rgba(168,85,247,.15); border-color: var(--n1); color: var(--n1); }
+.filter-pill.active-none { background: rgba(136,136,136,.15); border-color: var(--muted); color: var(--muted); }
+
+.pending-badge { font-size: 12px; color: var(--accent); font-weight: 600; }
+.log-entry { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+.log-entry-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.log-pattern { font-size: 20px; font-weight: 700; flex: 1; min-width: 0; }
+.log-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.log-date { font-size: 11px; color: var(--muted); }
 .log-source { font-size: 12px; color: var(--muted); }
-.log-meanings { font-size: 13px; color: #ccc; line-height: 1.55; border-top: 1px solid var(--border); padding-top: 8px; margin-top: 2px; }
-.log-actions { display: flex; gap: 8px; margin-top: 4px; }
-.log-action-btn { flex: 1; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 600; border: 1px solid var(--border); background: var(--card2); color: var(--muted); cursor: pointer; transition: all 0.15s; }
-.log-action-btn:active { transform: scale(0.96); }
-.log-action-btn.bunpro { color: var(--blue); border-color: rgba(59,130,246,0.3); }
-.log-action-btn.done   { color: var(--green); border-color: rgba(34,197,94,0.3); }
+.log-notes { font-size: 13px; color: #ccc; line-height: 1.55; }
+.log-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.log-action-btn { flex: 1; min-width: 52px; padding: 10px 6px; border-radius: 8px; font-size: 12px; font-weight: 600; border: 1px solid var(--border); background: var(--card2); color: var(--muted); cursor: pointer; transition: all .15s; text-decoration: none; display: flex; align-items: center; justify-content: center; }
+.log-action-btn:active { transform: scale(.96); }
+.log-action-btn.jisho  { color: var(--accent); border-color: rgba(249,115,22,.3); }
+.log-action-btn.bunpro { color: var(--blue);   border-color: rgba(59,130,246,.3); }
+.log-action-btn.added  { color: var(--green);  border-color: rgba(34,197,94,.3); }
+.log-action-btn.del    { color: var(--red);    border-color: rgba(239,68,68,.3); }
+.added-badge { font-size: 11px; font-weight: 600; background: rgba(34,197,94,.15); color: var(--green); border-radius: 6px; padding: 3px 8px; white-space: nowrap; }
 
-.empty-state { text-align: center; color: var(--muted); font-size: 14px; padding: 48px 0; line-height: 1.7; }
-.empty-state .big { font-size: 36px; margin-bottom: 12px; }
+.empty-state { text-align: center; color: var(--muted); font-size: 14px; padding: 48px 0; line-height: 1.8; }
+.empty-state .big { font-size: 40px; margin-bottom: 12px; }
 
-.loading-spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+/* OCR Modal */
+.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.9); z-index: 50; display: none; flex-direction: column; padding-top: env(safe-area-inset-top,0px); }
+.modal-backdrop.open { display: flex; }
+.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 12px; border-bottom: 1px solid var(--border); }
+.modal-header h2 { font-size: 16px; font-weight: 700; }
+.modal-close { background: none; border: none; color: var(--muted); font-size: 22px; cursor: pointer; padding: 4px; }
+.modal-body { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.ocr-preview { width: 100%; max-height: 180px; object-fit: contain; border-radius: 10px; border: 1px solid var(--border); display: none; }
+.ocr-preview.visible { display: block; }
+.ocr-status { font-size: 13px; color: var(--muted); text-align: center; padding: 8px 0; min-height: 32px; }
+.ocr-progress { background: var(--card2); border-radius: 8px; overflow: hidden; height: 4px; }
+.ocr-progress-bar { height: 100%; background: var(--accent); width: 0%; transition: width .3s; border-radius: 8px; }
+.ocr-results-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; color: var(--muted); text-transform: uppercase; }
+.ocr-results { display: flex; flex-direction: column; gap: 6px; }
+.ocr-line { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; font-size: 16px; cursor: pointer; transition: all .15s; line-height: 1.5; word-break: break-all; }
+.ocr-line:active { background: var(--accent-dim); border-color: var(--accent); transform: scale(.98); }
+.ocr-hint { font-size: 13px; color: var(--muted); text-align: center; line-height: 1.7; padding: 8px 0; }
+.loading-spinner { display: block; width: 22px; height: 22px; border: 2px solid rgba(255,255,255,.15); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; margin: 12px auto; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Settings */
-.settings-group { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-.settings-row { padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid var(--border); }
-.settings-row:last-child { border-bottom: none; }
-.settings-row label { margin-bottom: 0; }
-.settings-row p { font-size: 12px; color: var(--muted); line-height: 1.6; }
-.settings-row a { color: var(--accent); text-decoration: none; }
-.settings-section-title { font-size: 11px; font-weight: 600; letter-spacing: 0.07em; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
-.key-row { display: flex; gap: 8px; }
-.key-row input { flex: 1; }
-.show-btn { padding: 12px; background: var(--card2); border: 1px solid var(--border); color: var(--muted); border-radius: 10px; cursor: pointer; font-size: 13px; white-space: nowrap; }
-.status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
-.dot-ok   { background: var(--green); }
-.dot-warn { background: var(--yellow); }
-.free-badge { display: inline-block; font-size: 10px; font-weight: 700; background: rgba(34,197,94,0.15); color: var(--green); border-radius: 5px; padding: 2px 6px; letter-spacing: 0.05em; margin-left: 6px; vertical-align: middle; }
+.toast { position: fixed; bottom: calc(24px + var(--safe-bottom)); left: 50%; transform: translateX(-50%) translateY(20px); background: var(--card2); border: 1px solid var(--border); color: var(--text); border-radius: 20px; padding: 10px 18px; font-size: 13px; font-weight: 500; opacity: 0; transition: all .25s; pointer-events: none; z-index: 200; white-space: nowrap; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
 <div id="app">
-
   <header>
-    <div class="header-title">
-      <h1>文法メモ</h1>
-      <span>Grammar Capture</span>
-    </div>
-    <button class="icon-btn" onclick="showTab('settings')" title="Settings">⚙️</button>
+    <div class="header-title"><h1>文法メモ</h1><span>Grammar Capture</span></div>
   </header>
-
   <div class="tabbar">
     <button class="tab-btn active" id="tab-capture" onclick="showTab('capture')">＋ Capture</button>
-    <button class="tab-btn" id="tab-log"     onclick="showTab('log')">Log</button>
-    <button class="tab-btn" id="tab-settings" onclick="showTab('settings')">Settings</button>
+    <button class="tab-btn"        id="tab-log"     onclick="showTab('log')">Log</button>
   </div>
 
-  <!-- ═══ CAPTURE ═══ -->
+  <!-- CAPTURE -->
   <div class="screen active" id="screen-capture">
-
     <div class="field-group">
       <label>Grammar Pattern</label>
-      <input type="text" class="pattern-input" id="input-pattern" placeholder="〜てしまう" autocomplete="off" autocorrect="off" spellcheck="false"/>
+      <div class="pattern-row">
+        <input type="text" class="pattern-input" id="input-pattern"
+          placeholder="〜てしまう" autocomplete="off" autocorrect="off"
+          autocapitalize="none" spellcheck="false" oninput="onPatternInput()"/>
+        <button class="icon-btn" onclick="pastePattern()" title="Paste">📋</button>
+        <button class="icon-btn" onclick="triggerCamera()" title="Scan">📷</button>
+      </div>
+    </div>
+    <input type="file" id="camera-input" accept="image/*" capture="environment" onchange="handleImage(event)"/>
+
+    <div class="field-group">
+      <div class="jlpt-label-row">
+        <label style="margin-bottom:0">JLPT Level</label>
+        <div class="jlpt-auto-status" id="jlpt-status"></div>
+      </div>
+      <div class="jlpt-row" id="jlpt-selector">
+        <button class="jlpt-btn" data-level="N5" onclick="selectJLPT('N5')">N5</button>
+        <button class="jlpt-btn" data-level="N4" onclick="selectJLPT('N4')">N4</button>
+        <button class="jlpt-btn" data-level="N3" onclick="selectJLPT('N3')">N3</button>
+        <button class="jlpt-btn" data-level="N2" onclick="selectJLPT('N2')">N2</button>
+        <button class="jlpt-btn" data-level="N1" onclick="selectJLPT('N1')">N1</button>
+      </div>
     </div>
 
     <div class="field-group">
       <label>Source <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
       <input type="text" id="input-source" placeholder="Book title, show name…" autocomplete="off"/>
     </div>
-
     <div class="field-group">
-      <label>Your Notes <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+      <label>Notes <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
       <textarea id="input-notes" placeholder="Context, what confused you…" rows="3"></textarea>
     </div>
 
-    <button class="lookup-btn" id="lookup-btn" onclick="doLookup()">
-      🔍 Look up on Jisho
-    </button>
-
-    <div class="result-box" id="result-box">
-      <div class="result-label">Jisho Result</div>
-      <div id="result-content"></div>
+    <div class="btn-row">
+      <button class="lookup-btn" onclick="openJisho()">🔍 Jisho</button>
+      <button class="bunpro-btn" onclick="openBunpro()">🔗 Bunpro</button>
     </div>
-
-    <a class="bunpro-btn" id="bunpro-btn" href="#" target="_blank" rel="noopener">
-      🔗 Search on Bunpro →
-    </a>
-
     <div class="divider"></div>
-
-    <button class="save-btn" id="save-btn" onclick="doSave()">
-      Save to Notion
-    </button>
-
+    <button class="save-btn" onclick="doSave()">Save Entry</button>
   </div>
 
-  <!-- ═══ LOG ═══ -->
+  <!-- LOG -->
   <div class="screen" id="screen-log">
-    <div class="log-header">
-      <label style="margin-bottom:0">Recent Captures</label>
-      <button class="refresh-btn" onclick="loadLog()">↻ Refresh</button>
+    <div class="log-toolbar">
+      <input type="search" class="log-search" id="log-search"
+        placeholder="Search patterns, sources…"
+        oninput="renderLog()" autocorrect="off" autocapitalize="none"/>
+      <button class="export-btn" onclick="exportLog()">Export</button>
     </div>
-    <div id="log-list">
-      <div class="empty-state"><div class="big">📖</div>No entries yet.<br>Capture your first grammar point!</div>
+    <div class="filter-row" id="filter-row">
+      <button class="filter-pill active-all" data-filter="all"  onclick="setFilter('all')">All</button>
+      <button class="filter-pill" data-filter="N5"   onclick="setFilter('N5')">N5</button>
+      <button class="filter-pill" data-filter="N4"   onclick="setFilter('N4')">N4</button>
+      <button class="filter-pill" data-filter="N3"   onclick="setFilter('N3')">N3</button>
+      <button class="filter-pill" data-filter="N2"   onclick="setFilter('N2')">N2</button>
+      <button class="filter-pill" data-filter="N1"   onclick="setFilter('N1')">N1</button>
+      <button class="filter-pill" data-filter="none" onclick="setFilter('none')">No level</button>
     </div>
+    <div id="pending-info"></div>
+    <div id="log-list"></div>
   </div>
+</div>
 
-  <!-- ═══ SETTINGS ═══ -->
-  <div class="screen" id="screen-settings">
-
-    <div class="settings-group">
-      <div class="settings-row" style="background: rgba(34,197,94,0.05);">
-        <label>Jisho Dictionary <span class="free-badge">FREE</span></label>
-        <p>Grammar lookups use the free Jisho public API — no account or key needed. Works automatically.</p>
-      </div>
-    </div>
-
-    <p class="settings-section-title" style="margin-top:16px">Notion</p>
-    <div class="settings-group">
-      <div class="settings-row">
-        <label>Integration Token <span id="dot-notion" class="status-dot dot-warn"></span></label>
-        <p>Lets the app save to your Notion workspace. Create a free internal integration at <a href="https://www.notion.so/my-integrations" target="_blank">notion.so/my-integrations</a>, then open your <strong>Japanese grammar</strong> page in Notion → click <strong>…</strong> → <strong>Connections</strong> → add your integration.</p>
-        <div class="key-row">
-          <input type="password" id="key-notion" placeholder="secret_…" autocomplete="off" autocorrect="off" spellcheck="false"/>
-          <button class="show-btn" onclick="toggleShow('key-notion', this)">Show</button>
-        </div>
-      </div>
-    </div>
-
-    <button class="save-btn" onclick="saveSettings()" style="margin-top:4px">Save Settings</button>
-
-    <p class="settings-section-title" style="margin-top:20px">About</p>
-    <div class="settings-group">
-      <div class="settings-row">
-        <label>Notion Database</label>
-        <p>Saves to <strong>Grammar Discovery Log</strong> inside your Japanese grammar page. <a href="https://www.notion.so/ef6da210e321448fb014adf2a3a41fa2" target="_blank">Open in Notion →</a></p>
-      </div>
-      <div class="settings-row">
-        <label>Add to Home Screen</label>
-        <p>In Safari: tap the <strong>Share</strong> button → <strong>Add to Home Screen</strong> for an app-like experience with no browser bar.</p>
-      </div>
-    </div>
-
+<!-- OCR Modal -->
+<div class="modal-backdrop" id="ocr-modal">
+  <div class="modal-header">
+    <h2>Scan Text</h2>
+    <button class="modal-close" onclick="closeOCR()">✕</button>
+  </div>
+  <div class="modal-body">
+    <img id="ocr-preview" class="ocr-preview" alt=""/>
+    <div id="ocr-status" class="ocr-status"></div>
+    <div id="ocr-progress-wrap" style="display:none"><div class="ocr-progress"><div class="ocr-progress-bar" id="ocr-bar"></div></div></div>
+    <div id="ocr-output"></div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script>
-const NOTION_DB_ID = 'ef6da210e321448fb014adf2a3a41fa2';
+// ══════════════════════════════════════════════════════════════
+// JLPT LOOKUP TABLE — bundled, no network needed
+// Keys are grammar patterns without leading 〜／～
+// ══════════════════════════════════════════════════════════════
+const JLPT_DB = {
+  // ── N5 ──────────────────────────────────────────────────────
+  'てください':'N5','てくれ':'N5','ている':'N5','ていない':'N5',
+  'てもいい':'N5','てはいけない':'N5','ないでください':'N5',
+  'たい':'N5','たいです':'N5','たいと思う':'N5',
+  'ましょう':'N5','ましょうか':'N5','ませんか':'N5',
+  'から':'N5','まで':'N5','より':'N5',
+  'ほうがいい':'N5','ほうがいいです':'N5',
+  'がある':'N5','がいる':'N5','にある':'N5','にいる':'N5',
+  'でしょう':'N5','だろう':'N5',
+  'のが好き':'N5','のが嫌い':'N5','のが上手':'N5','のが下手':'N5',
+  'ごろ':'N5','くらい':'N5','ぐらい':'N5','ほど':'N5',
+  'んです':'N5','んですか':'N5','のです':'N5','のですか':'N5',
+  'ではない':'N5','じゃない':'N5','じゃなかった':'N5',
+  'でした':'N5','ませんでした':'N5',
+  'について':'N5',
+  // ── N4 ──────────────────────────────────────────────────────
+  'てしまう':'N4','てしまった':'N4','ちゃう':'N4','ちゃった':'N4',
+  'じゃう':'N4','じゃった':'N4',
+  'ておく':'N4','とく':'N4',
+  'てみる':'N4','てみた':'N4',
+  'てあげる':'N4','てやる':'N4',
+  'てもらう':'N4','てもらった':'N4',
+  'てくれる':'N4','てくれた':'N4',
+  'てくる':'N4','ていく':'N4',
+  'ことができる':'N4','ことができない':'N4','ことができた':'N4',
+  'ことがある':'N4','ことがない':'N4',
+  'たことがある':'N4','たことがない':'N4',
+  'ようにする':'N4','ようになる':'N4','ようになった':'N4',
+  'ようにしている':'N4',
+  'そうだ':'N4','そうです':'N4','そうな':'N4','そうに':'N4',
+  'らしい':'N4','らしく':'N4',
+  'はずだ':'N4','はずです':'N4','はずだった':'N4','はずがない':'N4',
+  'ために':'N4','のために':'N4',
+  'ば':'N4','れば':'N4','ければ':'N4','なければ':'N4',
+  'たら':'N4','なかったら':'N4','だったら':'N4',
+  'なら':'N4','のなら':'N4',
+  'ても':'N4','でも':'N4',
+  'のに':'N4',
+  'という':'N4','というのは':'N4','ということ':'N4','というふうに':'N4',
+  'によると':'N4','によれば':'N4',
+  'までに':'N4',
+  'だけ':'N4','だけで':'N4','だけでは':'N4',
+  'し':'N4',
+  'すぎる':'N4','すぎない':'N4','すぎた':'N4',
+  'やすい':'N4','にくい':'N4',
+  'てほしい':'N4','でほしい':'N4',
+  'てよかった':'N4',
+  'てから':'N4','てからでないと':'N4',
+  'あいだ':'N4','あいだに':'N4','間':'N4','間に':'N4',
+  'まえに':'N4','前に':'N4',
+  'あとで':'N4','後で':'N4',
+  'とき':'N4','ときに':'N4','時':'N4','時に':'N4',
+  'と思う':'N4','と思っている':'N4','と思った':'N4',
+  'かもしれない':'N4','かもしれません':'N4',
+  'ないといけない':'N4','なくてはいけない':'N4',
+  'なければならない':'N4','なければいけない':'N4',
+  'なくてもいい':'N4','なくていい':'N4',
+  'てもかまわない':'N4','てもかまいません':'N4',
+  'てある':'N4',
+  'がする':'N4',
+  'にする':'N4','になる':'N4',
+  'ようだ':'N4','ようです':'N4','ような':'N4','ように':'N4',
+  // ── N3 ──────────────────────────────────────────────────────
+  'ばかり':'N3','ばかりだ':'N3','ばかりで':'N3','ばかりでなく':'N3',
+  'だけでなく':'N3','だけでなく〜も':'N3',
+  'さえ':'N3','さえ〜ば':'N3','でさえ':'N3',
+  'ほど〜ない':'N3','ほどではない':'N3',
+  'くらいなら':'N3','ぐらいなら':'N3',
+  'ながら':'N3','ながらも':'N3',
+  'まま':'N3','たまま':'N3','ままで':'N3',
+  'っぱなし':'N3',
+  'てしかたがない':'N3','でしかたがない':'N3',
+  'てたまらない':'N3','でたまらない':'N3',
+  'てならない':'N3','でならない':'N3',
+  'わけだ':'N3','わけです':'N3',
+  'わけではない':'N3','わけじゃない':'N3',
+  'わけにはいかない':'N3','わけにもいかない':'N3',
+  'わけがない':'N3',
+  'ことになる':'N3','ことになった':'N3','ことになっている':'N3',
+  'ことにする':'N3','ことにした':'N3','ことにしている':'N3',
+  'みたいだ':'N3','みたいです':'N3','みたいな':'N3','みたいに':'N3',
+  'に対して':'N3','に対する':'N3','に対し':'N3',
+  'によって':'N3','による':'N3','により':'N3',
+  'として':'N3','としては':'N3','としても':'N3','とした':'N3',
+  'において':'N3','における':'N3','においては':'N3',
+  'に関して':'N3','に関する':'N3','に関し':'N3',
+  'に比べて':'N3','に比べ':'N3','に比べると':'N3',
+  'に加えて':'N3','に加え':'N3',
+  'せいで':'N3','せいか':'N3','せいだ':'N3',
+  'おかげで':'N3','おかげだ':'N3',
+  'ものだから':'N3','もので':'N3',
+  'に違いない':'N3','に違いありません':'N3',
+  'に決まっている':'N3','に決まってる':'N3',
+  'どころか':'N3','どころではない':'N3','どころじゃない':'N3',
+  'どうせ':'N3',
+  '一方だ':'N3','一方で':'N3',
+  'はじめる':'N3','だす':'N3','かける':'N3',
+  'おわる':'N3','きる':'N3','つくす':'N3',
+  'つづける':'N3','つづく':'N3',
+  'がちだ':'N3','がちな':'N3','がちに':'N3',
+  'っぽい':'N3','っぽく':'N3',
+  'らしく':'N3','らしさ':'N3',
+  'てみせる':'N3',
+  'てばかりいる':'N3','てばかりだ':'N3',
+  'ずに':'N3','ずにいる':'N3',
+  'ことか':'N3',
+  'ことだ':'N3',
+  'ようにいう':'N3','ようにお願いする':'N3',
+  'べきだ':'N3','べきではない':'N3','べき':'N3',
+  // ── N2 ──────────────────────────────────────────────────────
+  'ものだ':'N2','ものです':'N2',
+  'ものではない':'N2','ものじゃない':'N2',
+  'ものの':'N2',
+  'ものなら':'N2',
+  'ものがある':'N2',
+  'ことなく':'N2','ことなしに':'N2',
+  'にもかかわらず':'N2','にもかかわらず〜':'N2',
+  'にしては':'N2',
+  'うえで':'N2','上で':'N2',
+  'うえに':'N2','上に':'N2',
+  'うえは':'N2','上は':'N2',
+  'いっぽうで':'N2','一方で':'N2','一方では':'N2',
+  'はんめん':'N2','反面':'N2','半面':'N2',
+  'たびに':'N2','度に':'N2',
+  'につれて':'N2','につれ':'N2',
+  'にしたがって':'N2','に従って':'N2','に従い':'N2',
+  'におうじて':'N2','に応じて':'N2','に応じ':'N2',
+  'しだい':'N2','次第':'N2','次第で':'N2','次第によっては':'N2',
+  'しだいに':'N2','次第に':'N2',
+  'あまり':'N2','あまりに':'N2','あまりにも':'N2',
+  'あげく':'N2','あげくに':'N2','あげくのはてに':'N2',
+  'すえに':'N2','末に':'N2','末の':'N2',
+  'けっか':'N2','結果':'N2','結果として':'N2',
+  'にさいして':'N2','に際して':'N2','に際し':'N2',
+  'にあたって':'N2','にあたり':'N2','にあたる':'N2',
+  'むけに':'N2','向けに':'N2','向けの':'N2','向きだ':'N2',
+  'からこそ':'N2','こそ':'N2','だからこそ':'N2',
+  'はもとより':'N2','はもちろん':'N2',
+  'ならともかく':'N2','はともかく':'N2','はともかくとして':'N2',
+  'をつうじて':'N2','を通じて':'N2','を通して':'N2',
+  'にわたって':'N2','にわたり':'N2','にわたる':'N2',
+  'をはじめとして':'N2','をはじめ':'N2','をはじめとする':'N2',
+  'だけあって':'N2','だけに':'N2','だけのことはある':'N2',
+  'ところが':'N2','ところで':'N2','ところに':'N2','ところを':'N2',
+  'ばかりか':'N2',
+  'にあって':'N2','にあっては':'N2',
+  'にかかわる':'N2',
+  'をもとに':'N2','を基に':'N2','をもとにして':'N2',
+  'をふまえて':'N2','を踏まえて':'N2','を踏まえ':'N2',
+  'ようによっては':'N2',
+  'といえば':'N2','といえども':'N2',
+  'ないまでも':'N2',
+  'にしたって':'N2',
+  'によっては':'N2',
+  'をきっかけに':'N2','を契機に':'N2','をきっかけとして':'N2',
+  'をめぐって':'N2','をめぐり':'N2','をめぐる':'N2',
+  // ── N1 ──────────────────────────────────────────────────────
+  'をもって':'N1','をもってしても':'N1','をもってすれば':'N1',
+  'にいたって':'N1','に至って':'N1','に至っては':'N1','に至るまで':'N1',
+  'ならでは':'N1','ならではの':'N1',
+  'いかんによらず':'N1','いかんにかかわらず':'N1','いかんだ':'N1','いかんで':'N1',
+  'にして':'N1',
+  'としたところで':'N1','としたって':'N1',
+  'とあれば':'N1','とあっては':'N1','とあって':'N1',
+  'んがため':'N1','んがために':'N1',
+  'かたわら':'N1','傍ら':'N1',
+  'かねない':'N1','かねません':'N1',
+  'かねる':'N1','かねます':'N1',
+  'きらいがある':'N1',
+  'ずにはすまない':'N1','ないではすまない':'N1',
+  'ずにはいられない':'N1','ないではいられない':'N1',
+  'だに':'N1',
+  'たりとも':'N1',
+  'というもの':'N1','というものだ':'N1','というものではない':'N1',
+  'といったところだ':'N1','といったところか':'N1',
+  'にほかならない':'N1','にほかなりません':'N1',
+  'にすぎない':'N1','にすぎません':'N1',
+  'にそくして':'N1','に即して':'N1','に即した':'N1',
+  'にそって':'N1','に沿って':'N1','に沿い':'N1','に沿った':'N1',
+  'にのっとり':'N1','に則り':'N1','に則った':'N1',
+  'にもとづいて':'N1','に基づいて':'N1','に基づき':'N1','に基づく':'N1',
+  'ゆえに':'N1','ゆえの':'N1','ゆえだ':'N1','ゆえ':'N1',
+  'ともなると':'N1','ともなれば':'N1','ともなって':'N1',
+  'ともあろう':'N1',
+  'とばかりに':'N1',
+  'とみえて':'N1','とみえる':'N1',
+  'ながらも':'N1','ながらに':'N1','ながらにして':'N1',
+  'にたえない':'N1','にたえる':'N1',
+  'にたる':'N1','に足る':'N1','に足りない':'N1','に足らない':'N1',
+  'をかわきりに':'N1','を皮切りに':'N1','を皮切りとして':'N1',
+  'あっての':'N1','あってこそ':'N1',
+  'こそあれ':'N1',
+  'なりに':'N1','なりの':'N1','なりで':'N1',
+  'ならいざしらず':'N1','はいざしらず':'N1',
+  'ものを':'N1','ものか':'N1','ものだろうか':'N1',
+  'べく':'N1','べくして':'N1',
+  'まいか':'N1','まい':'N1',
+  'からして':'N1','からすると':'N1','からすれば':'N1',
+  'からして〜':'N1',
+  'いかにも':'N1',
+  'かと思えば':'N1','かと思うと':'N1',
+  'ないことには':'N1','ないことはない':'N1',
+  'ことのないように':'N1',
+  'てやまない':'N1','でやまない':'N1',
+  'にかたくない':'N1','に難くない':'N1',
+  'をものともせず':'N1','をものとせず':'N1',
+  'それまでだ':'N1','それだけだ':'N1',
+  'ばそれまでだ':'N1',
+  'とはいえ':'N1','とはいうものの':'N1',
+  'であれ':'N1','であれ〜であれ':'N1',
+  'にせよ':'N1','にしろ':'N1','にせよ〜にせよ':'N1',
+  'ようが':'N1','ようと':'N1','ようとも':'N1',
+  'まじき':'N1','まじ':'N1',
+};
 
-// ── Storage ────────────────────────────────────────────────────
-const getKey = k => localStorage.getItem(k) || '';
-const setKey = (k,v) => localStorage.setItem(k,v);
+// ══════════════════════════════════════════════════════════════
+// JLPT LOOKUP LOGIC
+// ══════════════════════════════════════════════════════════════
+function lookupJLPT(raw) {
+  if (!raw) return null;
+  // Strip leading 〜 ～ and whitespace
+  const clean = raw.replace(/^[〜～\s]+/, '').trim();
+  if (!clean) return null;
 
-document.addEventListener('DOMContentLoaded', () => {
-  const nk = getKey('notion_key');
-  if (nk) document.getElementById('key-notion').value = nk;
-  updateDots();
-});
+  // 1. Exact match
+  if (JLPT_DB[clean]) return JLPT_DB[clean];
 
-function updateDots() {
-  const nk = getKey('notion_key');
-  const dot = document.getElementById('dot-notion');
-  dot.className = 'status-dot ' + (nk ? 'dot-ok' : 'dot-warn');
+  // 2. Prefix match — find longest key that the input starts with
+  let bestKey = '', bestLevel = null;
+  for (const key of Object.keys(JLPT_DB)) {
+    if (clean.startsWith(key) && key.length > bestKey.length) {
+      bestKey = key; bestLevel = JLPT_DB[key];
+    }
+  }
+  if (bestLevel) return bestLevel;
+
+  // 3. Suffix match — input ends with a known key (for 〜 patterns typed mid-word)
+  for (const key of Object.keys(JLPT_DB)) {
+    if (clean.endsWith(key) && key.length > bestKey.length) {
+      bestKey = key; bestLevel = JLPT_DB[key];
+    }
+  }
+  return bestLevel;
 }
+
+// ══════════════════════════════════════════════════════════════
+// APP STATE & STORAGE
+// ══════════════════════════════════════════════════════════════
+const STORAGE_KEY = 'grammar_entries';
+let selectedJLPT  = null;
+let activeFilter  = 'all';
+let jlptDebounce  = null;
+let autoDetected  = false;
+
+function loadEntries() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { return []; } }
+function saveEntries(e) { localStorage.setItem(STORAGE_KEY, JSON.stringify(e)); }
 
 // ── Tabs ───────────────────────────────────────────────────────
 function showTab(tab) {
@@ -325,286 +501,263 @@ function showTab(tab) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('screen-' + tab).classList.add('active');
   document.getElementById('tab-' + tab).classList.add('active');
-  if (tab === 'log') loadLog();
+  if (tab === 'log') renderLog();
 }
 
 // ── Toast ──────────────────────────────────────────────────────
-function toast(msg, duration = 2400) {
+function toast(msg) {
   const el = document.getElementById('toast');
   el.textContent = msg;
   el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), duration);
+  setTimeout(() => el.classList.remove('show'), 2400);
 }
 
-// ── Settings ───────────────────────────────────────────────────
-function saveSettings() {
-  setKey('notion_key', document.getElementById('key-notion').value.trim());
-  updateDots();
-  toast('✓ Settings saved');
-}
-function toggleShow(id, btn) {
-  const inp = document.getElementById(id);
-  inp.type = inp.type === 'password' ? 'text' : 'password';
-  btn.textContent = inp.type === 'password' ? 'Show' : 'Hide';
-}
-
-// ── Jisho Lookup ───────────────────────────────────────────────
-let lastLookupSummary = '';
-
-async function doLookup() {
-  const raw = document.getElementById('input-pattern').value.trim();
-  if (!raw) { toast('Enter a grammar pattern first'); return; }
-
-  // Strip leading 〜 ～ for the search query
-  const query = raw.replace(/^[〜～\s]+/, '').trim();
-
-  const btn = document.getElementById('lookup-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="loading-spinner"></span> Looking up…';
-
-  const box     = document.getElementById('result-box');
-  const content = document.getElementById('result-content');
-
-  try {
-    const res = await fetch(`https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(query)}`);
-    if (!res.ok) throw new Error(res.status);
-    const data = await res.json();
-
-    if (!data.data || !data.data.length) {
-      content.innerHTML = '<div class="no-result">No results found. Try a shorter form or the core verb.</div>';
-      lastLookupSummary = '';
-      box.classList.add('visible');
+// ── Pattern input → auto JLPT ─────────────────────────────────
+function onPatternInput() {
+  clearTimeout(jlptDebounce);
+  const val = document.getElementById('input-pattern').value.trim();
+  if (!val) { clearJLPTAuto(); return; }
+  setJLPTStatus('<span class="mini-spinner"></span>');
+  jlptDebounce = setTimeout(() => {
+    const level = lookupJLPT(val);
+    if (level) {
+      applyJLPT(level, true);
+      setJLPTStatus(`<span style="color:var(--${level.toLowerCase()})">↑ ${level} detected</span>`);
     } else {
-      const top = data.data[0];
-      const html = buildResultHTML(top);
-      content.innerHTML = html;
-      lastLookupSummary = buildSummaryText(top);
-      box.classList.add('visible');
-
-      // Bunpro link
-      const encoded = encodeURIComponent(query);
-      const bp = document.getElementById('bunpro-btn');
-      bp.href = `https://bunpro.jp/search?q=${encoded}`;
-      bp.classList.add('visible');
+      clearJLPTAuto();
+      setJLPTStatus('<span style="color:var(--muted)">not found</span>');
     }
-  } catch (e) {
-    content.innerHTML = '<div class="no-result">Lookup failed — check your connection.</div>';
-    box.classList.add('visible');
+  }, 500);
+}
+
+function setJLPTStatus(html) {
+  document.getElementById('jlpt-status').innerHTML = html;
+}
+
+function clearJLPTAuto() {
+  if (autoDetected) { applyJLPT(null, false); autoDetected = false; }
+  setJLPTStatus('');
+}
+
+function applyJLPT(level, isAuto) {
+  autoDetected = isAuto;
+  selectedJLPT = level;
+  document.querySelectorAll('.jlpt-btn').forEach(b => {
+    b.className = 'jlpt-btn' + (b.dataset.level === level ? ' selected-' + level : '');
+  });
+}
+
+function selectJLPT(level) {
+  // Manual tap overrides auto-detection
+  clearTimeout(jlptDebounce);
+  if (selectedJLPT === level) {
+    applyJLPT(null, false);
+    setJLPTStatus('');
+  } else {
+    applyJLPT(level, false);
+    setJLPTStatus('');
   }
-
-  btn.disabled = false;
-  btn.innerHTML = '🔍 Look up on Jisho';
 }
 
-function buildResultHTML(entry) {
-  const japanese = entry.japanese || [];
-  const senses   = entry.senses   || [];
-  const isCommon = entry.is_common;
-
-  const word    = japanese[0]?.word    || japanese[0]?.reading || '';
-  const reading = japanese[0]?.reading || '';
-
-  // Tags: JLPT, common
-  const tags = [];
-  if (isCommon) tags.push(`<span class="tag tag-common">common</span>`);
-  (entry.jlpt || []).forEach(j => tags.push(`<span class="tag tag-jlpt">${j.toUpperCase()}</span>`));
-
-  // Up to 3 senses
-  const shownSenses = senses.slice(0, 3);
-  const meaningsHTML = shownSenses.map((s, i) => {
-    const pos = (s.parts_of_speech || []).slice(0,2).map(p =>
-      `<span class="tag tag-pos">${p}</span>`
-    ).join('');
-    const defs = (s.english_definitions || []).slice(0, 4).join('; ');
-    return `
-      ${pos ? `<div class="result-tags" style="margin-bottom:4px">${pos}</div>` : ''}
-      <div class="meaning-row">
-        <span class="meaning-num">${i+1}.</span>
-        <span class="meaning-text">${defs}</span>
-      </div>`;
-  }).join('');
-
-  return `
-    <div class="result-header">
-      ${word ? `<span class="result-word">${word}</span>` : ''}
-      ${reading && reading !== word ? `<span class="result-reading">${reading}</span>` : ''}
-    </div>
-    ${tags.length ? `<div class="result-tags">${tags.join('')}</div>` : ''}
-    <div class="result-meanings">${meaningsHTML}</div>
-  `;
+function resetJLPT() {
+  applyJLPT(null, false);
+  setJLPTStatus('');
 }
 
-function buildSummaryText(entry) {
-  const japanese = entry.japanese || [];
-  const senses   = entry.senses   || [];
-  const word     = japanese[0]?.word || japanese[0]?.reading || '';
-  const reading  = japanese[0]?.reading || '';
-  const jlpt     = (entry.jlpt || []).join(', ').toUpperCase();
-  const defs     = senses.slice(0,2).map(s =>
-    (s.english_definitions || []).slice(0,3).join(', ')
-  ).join(' / ');
-  return [word && `Word: ${word}`, reading && `Reading: ${reading}`, jlpt && `JLPT: ${jlpt}`, defs && `Meanings: ${defs}`].filter(Boolean).join(' | ');
+// ── Paste ──────────────────────────────────────────────────────
+async function pastePattern() {
+  try {
+    const text = await navigator.clipboard.readText();
+    if (text.trim()) {
+      document.getElementById('input-pattern').value = text.trim();
+      onPatternInput();
+      toast('✓ Pasted');
+    } else { toast('Clipboard is empty'); }
+  } catch {
+    document.getElementById('input-pattern').focus();
+    toast('Tap the field and hold to paste');
+  }
 }
 
-// ── Save to Notion ─────────────────────────────────────────────
-async function doSave() {
+// ── External links ─────────────────────────────────────────────
+function openJisho() {
+  const p = document.getElementById('input-pattern').value.trim();
+  if (!p) { toast('Enter a pattern first'); return; }
+  window.open(`https://jisho.org/search/${encodeURIComponent(p.replace(/^[〜～\s]+/,''))}`, '_blank');
+}
+function openBunpro() {
+  const p = document.getElementById('input-pattern').value.trim();
+  if (!p) { toast('Enter a pattern first'); return; }
+  window.open(`https://bunpro.jp/search?q=${encodeURIComponent(p.replace(/^[〜～\s]+/,''))}`, '_blank');
+}
+
+// ── Save ───────────────────────────────────────────────────────
+function doSave() {
   const pattern = document.getElementById('input-pattern').value.trim();
   if (!pattern) { toast('Enter a grammar pattern first'); return; }
-
-  const nk = getKey('notion_key');
-  if (!nk) { toast('Add your Notion token in Settings'); showTab('settings'); return; }
-
-  const source  = document.getElementById('input-source').value.trim();
-  const notes   = document.getElementById('input-notes').value.trim();
-  const hasLookup = !!lastLookupSummary;
-
-  const btn = document.getElementById('save-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="loading-spinner"></span> Saving…';
-
-  const properties = {
-    Pattern: { title: [{ text: { content: pattern } }] },
-    Status:  { select: { name: hasLookup ? 'Explained' : 'Captured' } },
-    'Added to Bunpro': { checkbox: false }
-  };
-  if (source)         properties['Source']         = { rich_text: [{ text: { content: source } }] };
-  if (notes)          properties['Notes']           = { rich_text: [{ text: { content: notes } }] };
-  if (lastLookupSummary) properties['AI Explanation'] = { rich_text: [{ text: { content: lastLookupSummary } }] };
-
-  try {
-    const res = await fetch('https://api.notion.com/v1/pages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${nk}`,
-        'Notion-Version': '2022-06-28'
-      },
-      body: JSON.stringify({ parent: { database_id: NOTION_DB_ID }, properties })
-    });
-
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.message || res.status);
-    }
-
-    toast('✓ Saved to Notion!');
-    resetForm();
-
-  } catch (e) {
-    toast('Save failed — check your Notion token');
-    console.error(e);
-  }
-
-  btn.disabled = false;
-  btn.innerHTML = 'Save to Notion';
-}
-
-function resetForm() {
+  const entries = loadEntries();
+  entries.unshift({
+    id: Date.now(), pattern,
+    jlpt:   selectedJLPT,
+    source: document.getElementById('input-source').value.trim(),
+    notes:  document.getElementById('input-notes').value.trim(),
+    date:   new Date().toISOString(),
+    addedToBunpro: false
+  });
+  saveEntries(entries);
+  toast('✓ Saved!');
   document.getElementById('input-pattern').value = '';
   document.getElementById('input-source').value  = '';
   document.getElementById('input-notes').value   = '';
-  document.getElementById('result-box').classList.remove('visible');
-  document.getElementById('bunpro-btn').classList.remove('visible');
-  document.getElementById('bunpro-btn').href = '#';
-  lastLookupSummary = '';
+  resetJLPT();
 }
 
-// ── Load Log ───────────────────────────────────────────────────
-async function loadLog() {
-  const nk   = getKey('notion_key');
-  const list = document.getElementById('log-list');
+// ── Export ─────────────────────────────────────────────────────
+function exportLog() {
+  const entries = loadEntries();
+  if (!entries.length) { toast('Nothing to export yet'); return; }
+  const lines = ['Pattern\tJLPT\tSource\tNotes\tDate\tAdded to Bunpro'];
+  entries.forEach(e => lines.push([e.pattern, e.jlpt||'', e.source||'', e.notes||'', e.date.slice(0,10), e.addedToBunpro?'Yes':'No'].join('\t')));
+  const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = 'grammar-log.txt'; a.click();
+  URL.revokeObjectURL(url);
+  toast('✓ Exported!');
+}
 
-  if (!nk) {
-    list.innerHTML = '<div class="empty-state"><div class="big">🔑</div>Add your Notion token<br>in Settings to see your log.</div>';
+// ── JLPT filter ────────────────────────────────────────────────
+function setFilter(f) {
+  activeFilter = f;
+  document.querySelectorAll('.filter-pill').forEach(p => {
+    p.className = 'filter-pill' + (p.dataset.filter === f ? ' active-' + f : '');
+  });
+  renderLog();
+}
+
+// ── Render Log ─────────────────────────────────────────────────
+function renderLog() {
+  const query = (document.getElementById('log-search')?.value || '').toLowerCase();
+  let entries = loadEntries();
+  if (query) entries = entries.filter(e =>
+    e.pattern.toLowerCase().includes(query) ||
+    (e.source||'').toLowerCase().includes(query) ||
+    (e.notes||'').toLowerCase().includes(query) ||
+    (e.jlpt||'').toLowerCase().includes(query)
+  );
+  if (activeFilter !== 'all') {
+    entries = entries.filter(e => activeFilter === 'none' ? !e.jlpt : e.jlpt === activeFilter);
+  }
+  const pending = loadEntries().filter(e => !e.addedToBunpro).length;
+  document.getElementById('pending-info').innerHTML = pending
+    ? `<span class="pending-badge">${pending} pending Bunpro</span>` : '';
+
+  const list = document.getElementById('log-list');
+  if (!entries.length) {
+    list.innerHTML = (query || activeFilter !== 'all')
+      ? '<div class="empty-state"><div class="big">🔍</div>No results.</div>'
+      : '<div class="empty-state"><div class="big">📖</div>No entries yet.<br>Capture your first grammar point!</div>';
     return;
   }
+  list.innerHTML = '';
+  entries.forEach(e => {
+    const fmt = new Date(e.date).toLocaleDateString('en-GB', { day:'numeric', month:'short' });
+    const q   = encodeURIComponent(e.pattern.replace(/^[〜～\s]+/,''));
+    const el  = document.createElement('div');
+    el.className = 'log-entry';
+    el.innerHTML = `
+      <div class="log-entry-top">
+        <span class="log-pattern">${e.pattern}</span>
+        <div class="log-meta">
+          ${e.jlpt ? `<span class="jlpt-badge badge-${e.jlpt}">${e.jlpt}</span>` : ''}
+          ${e.addedToBunpro ? '<span class="added-badge">✓ In Bunpro</span>' : `<span class="log-date">${fmt}</span>`}
+        </div>
+      </div>
+      ${e.source ? `<div class="log-source">📚 ${e.source}</div>` : ''}
+      ${e.notes  ? `<div class="log-notes">${e.notes}</div>`      : ''}
+      <div class="log-actions">
+        <a class="log-action-btn jisho"  href="https://jisho.org/search/${q}" target="_blank" rel="noopener">Jisho</a>
+        <a class="log-action-btn bunpro" href="https://bunpro.jp/search?q=${q}" target="_blank" rel="noopener">Bunpro</a>
+        ${!e.addedToBunpro ? `<button class="log-action-btn added" onclick="markAdded(${e.id})">✓ Added</button>` : ''}
+        <button class="log-action-btn del" onclick="deleteEntry(${e.id})">✕</button>
+      </div>`;
+    list.appendChild(el);
+  });
+}
 
-  list.innerHTML = '<div class="empty-state"><span class="loading-spinner" style="width:24px;height:24px;border-width:3px;margin:48px auto;display:block"></span></div>';
+function markAdded(id) {
+  const entries = loadEntries();
+  const e = entries.find(x => x.id === id);
+  if (e) { e.addedToBunpro = true; saveEntries(entries); renderLog(); toast('✓ Marked as added!'); }
+}
+function deleteEntry(id) {
+  saveEntries(loadEntries().filter(x => x.id !== id));
+  renderLog();
+}
 
+// ── OCR ───────────────────────────────────────────────────────
+function triggerCamera() { document.getElementById('camera-input').click(); }
+
+function handleImage(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  event.target.value = '';
+  document.getElementById('ocr-modal').classList.add('open');
+  const preview = document.getElementById('ocr-preview');
+  preview.src = URL.createObjectURL(file);
+  preview.classList.add('visible');
+  document.getElementById('ocr-output').innerHTML = '';
+  document.getElementById('ocr-status').innerHTML = '<span class="loading-spinner"></span>';
+  document.getElementById('ocr-progress-wrap').style.display = 'block';
+  document.getElementById('ocr-bar').style.width = '0%';
+  runOCR(file);
+}
+
+async function runOCR(file) {
+  const status = document.getElementById('ocr-status');
+  const bar    = document.getElementById('ocr-bar');
+  const output = document.getElementById('ocr-output');
   try {
-    const res = await fetch(`https://api.notion.com/v1/databases/${NOTION_DB_ID}/query`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${nk}`,
-        'Notion-Version': '2022-06-28'
-      },
-      body: JSON.stringify({ sorts: [{ timestamp: 'created_time', direction: 'descending' }], page_size: 30 })
+    const result = await Tesseract.recognize(file, 'jpn', {
+      logger: m => {
+        if (m.status === 'recognizing text') { bar.style.width = Math.round(m.progress*100)+'%'; status.textContent = `Scanning… ${Math.round(m.progress*100)}%`; }
+        else if (m.status === 'loading tesseract core')     status.textContent = 'Loading OCR engine…';
+        else if (m.status === 'initializing tesseract')     status.textContent = 'Initialising…';
+        else if (m.status === 'loading language traineddata') status.textContent = 'Loading Japanese data… (first time only)';
+      }
     });
-
-    if (!res.ok) throw new Error(res.status);
-    const data = await res.json();
-
-    if (!data.results.length) {
-      list.innerHTML = '<div class="empty-state"><div class="big">📖</div>No entries yet.<br>Capture your first grammar point!</div>';
-      return;
-    }
-
-    list.innerHTML = '';
-    for (const page of data.results) {
-      const p       = page.properties;
-      const pattern = p.Pattern?.title?.[0]?.text?.content || '—';
-      const source  = p.Source?.rich_text?.[0]?.text?.content || '';
-      const summary = p['AI Explanation']?.rich_text?.[0]?.text?.content || '';
-      const status  = p.Status?.select?.name || 'Captured';
-      const addedBP = p['Added to Bunpro']?.checkbox || false;
-      const pageId  = page.id;
-
-      const statusKey   = addedBP ? 'Added' : status.replace(/\s+/g, '-');
-      const statusLabel = addedBP ? '✓ In Bunpro' : status;
-
-      const searchTerm  = encodeURIComponent(pattern.replace(/^[〜～\s]+/, ''));
-
+    document.getElementById('ocr-progress-wrap').style.display = 'none';
+    status.textContent = '';
+    const lines = result.data.text.split('\n').map(l=>l.trim()).filter(l=>l.length>0&&/[\u3000-\u9fff\uff00-\uffef]/.test(l));
+    if (!lines.length) { output.innerHTML='<div class="ocr-hint">No Japanese text detected.<br>Try a clearer photo with the text filling the frame.</div>'; return; }
+    output.innerHTML='<div class="ocr-results-label" style="margin-bottom:8px">Tap a line to use as your pattern</div><div class="ocr-results" id="ocr-lines"></div>';
+    const container = document.getElementById('ocr-lines');
+    lines.forEach(line => {
       const el = document.createElement('div');
-      el.className = 'log-entry';
-      el.innerHTML = `
-        <div class="log-entry-top">
-          <span class="log-pattern">${pattern}</span>
-          <span class="log-status status-${statusKey}">${statusLabel}</span>
-        </div>
-        ${source  ? `<div class="log-source">📚 ${source}</div>` : ''}
-        ${summary ? `<div class="log-meanings">${summary}</div>` : ''}
-        <div class="log-actions">
-          <button class="log-action-btn bunpro" onclick="window.open('https://bunpro.jp/search?q=${searchTerm}','_blank')">Search Bunpro</button>
-          ${!addedBP ? `<button class="log-action-btn done" onclick="markAdded('${pageId}', this)">✓ Added to Bunpro</button>` : ''}
-        </div>
-      `;
-      list.appendChild(el);
-    }
-  } catch (e) {
-    list.innerHTML = '<div class="empty-state"><div class="big">⚠️</div>Couldn\'t load log.<br>Check your Notion token.</div>';
-    console.error(e);
+      el.className = 'ocr-line'; el.textContent = line;
+      el.onclick = () => {
+        document.getElementById('input-pattern').value = line;
+        onPatternInput();
+        closeOCR();
+        toast('✓ Pattern inserted');
+      };
+      container.appendChild(el);
+    });
+  } catch(err) {
+    document.getElementById('ocr-progress-wrap').style.display = 'none';
+    status.textContent = '';
+    output.innerHTML='<div class="ocr-hint">OCR failed — please try again.</div>';
   }
 }
 
-async function markAdded(pageId, btn) {
-  const nk = getKey('notion_key');
-  if (!nk) return;
-  btn.disabled = true;
-  btn.textContent = '…';
-  try {
-    await fetch(`https://api.notion.com/v1/pages/${pageId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${nk}`,
-        'Notion-Version': '2022-06-28'
-      },
-      body: JSON.stringify({
-        properties: {
-          'Added to Bunpro': { checkbox: true },
-          'Status': { select: { name: 'Added to Bunpro' } }
-        }
-      })
-    });
-    toast('✓ Marked as added!');
-    loadLog();
-  } catch(e) {
-    btn.disabled = false;
-    btn.textContent = '✓ Added to Bunpro';
-    toast('Update failed');
-  }
+function closeOCR() {
+  document.getElementById('ocr-modal').classList.remove('open');
+  const p = document.getElementById('ocr-preview');
+  if (p.src) URL.revokeObjectURL(p.src);
+  p.classList.remove('visible');
 }
+
+renderLog();
 </script>
 </body>
 </html>
